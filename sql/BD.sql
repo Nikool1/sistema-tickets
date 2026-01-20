@@ -1,10 +1,4 @@
 
-"CREACION BASE DE DATOS"
-DROP DATABASE IF EXISTS sistema_tickets;
-CREATE DATABASE sistema_tickets CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE sistema_tickets;
-
-
 "CREACION TABLAS"
 CREATE TABLE roles (
   id_rol INT AUTO_INCREMENT PRIMARY KEY,
