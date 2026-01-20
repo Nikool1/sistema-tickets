@@ -85,7 +85,7 @@ INSERT INTO estados (nombre_estado) VALUES
 ('Resuelto'),
 ('Cerrado');
 
-INSERT INTO categorias (nombre_categoria, `descripción`) VALUES
+INSERT INTO categorias (nombre_categoria, `descripcion`) VALUES
 ('Credenciales', 'Accesos y contraseñas'),
 ('Soporte Técnico', 'Problemas de hardware/software'),
 ('Impresoras', 'Problemas de impresión'),
