@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
-$user = "usuario_db";
-$pass = "password_db";
+$user = "root";
+$pass = "";
 $db   = "sistema_tickets";
 
 $conn = new mysqli($host, $user, $pass, $db);

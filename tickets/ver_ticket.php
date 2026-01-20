@@ -99,7 +99,7 @@ unset($_SESSION["flash_ok"]);
 <p><b>Estado:</b> <?= htmlspecialchars($ticket["nombre_estado"]) ?></p>
 <p><b>Tecnico asignado:</b> <?= htmlspecialchars($ticket["tecnico_asignado"] ?? "Sin asignar") ?></p>
 <p><b>Fecha creacion:</b> <?= htmlspecialchars($ticket["fecha_creacion"]) ?></p>
-<p><b>Última actualizacion (ticket):</b> <?= htmlspecialchars($ticket["fecha_actualizacion"]) ?></p>
+<p><b>Ultima actualizacion (ticket):</b> <?= htmlspecialchars($ticket["fecha_actualizacion"]) ?></p>
 
 <hr>
 
@@ -109,7 +109,7 @@ unset($_SESSION["flash_ok"]);
 <hr>
 
 
-<h2>Última actualizacion (bitacora)</h2>
+<h2>Ultima actualizacion (bitacora)</h2>
 
 <?php if ($bit): ?>
   <p><b>Accion:</b> <?= htmlspecialchars($bit["accion"]) ?></p>
