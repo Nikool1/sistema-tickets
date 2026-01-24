@@ -4,55 +4,68 @@ if (!isset($_SESSION["id_usuario"])) {
   header("Location: ../auth/login.php");
   exit;
 }
-//solo tecnico(2) o admin(3)
+// solo tecnico(2) o admin(3)
 if (!isset($_SESSION["id_rol"]) || ($_SESSION["id_rol"] != 2 && $_SESSION["id_rol"] != 3)) {
   header("Location: ../auth/login.php");
   exit;
 }
+
 $error = $_GET["error"] ?? "";
 $ok = $_GET["ok"] ?? "";
+
+$page_title = "Crear Usuario";
+require_once __DIR__ . '/../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Crear Usuario</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
-  <h1>Crear Usuario</h1>
+
+<div class="card">
+  <h1 class="title">Crear Usuario</h1>
+  <p class="subtitle">Registro de usuarios del sistema</p>
 
   <?php if ($error): ?>
-    <p style="color:red;"><?= htmlspecialchars($error) ?></p>
+    <div class="alert"><?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
 
   <?php if ($ok): ?>
-    <p style="color:green;"><?= htmlspecialchars($ok) ?></p>
+    <div class="alert" style="border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12);">
+      <?= htmlspecialchars($ok) ?>
+    </div>
   <?php endif; ?>
 
-  <form method="post" action="guardar_usuario.php">
-    <label>Nombre</label><br>
-    <input type="text" name="nombre_usuario" required><br><br>
+  <form class="form" method="post" action="guardar_usuario.php">
+    <div class="field">
+      <label>Nombre</label>
+      <input class="input" type="text" name="nombre_usuario" required>
+    </div>
 
-    <label>RUT</label><br>
-    <input type="text" name="rut" required><br><br>
+    <div class="field">
+      <label>RUT</label>
+      <input class="input" type="text" name="rut" required>
+    </div>
 
-    <label>Correo institucional</label><br>
-    <input type="email" name="correo_institucional" required><br><br>
+    <div class="field">
+      <label>Correo institucional</label>
+      <input class="input" type="email" name="correo_institucional" required>
+    </div>
 
-    <label>Contraseña</label><br>
-    <input type="password" name="password" required><br><br>
+    <div class="field">
+      <label>Contraseña</label>
+      <input class="input" type="password" name="password" required>
+    </div>
 
-    <label>Rol</label><br>
-    <select name="id_rol" required>
-      <option value="1">Funcionario</option>
-      <option value="2">Tecnico</option>
-      <option value="3">Administrador</option>
-    </select><br><br>
+    <div class="field">
+      <label>Rol</label>
+      <select name="id_rol" required>
+        <option value="1">Funcionario</option>
+        <option value="2">Tecnico</option>
+        <option value="3">Administrador</option>
+      </select>
+    </div>
 
-    <button type="submit">Crear</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-primary" type="submit">Crear</button>
+      <a class="btn" href="../dashboards/<?= htmlspecialchars($_SESSION["dashboard"]) ?>">Volver al panel</a>
+    </div>
   </form>
+</div>
 
-  <p><a href="../dashboards/<?=$_SESSION["dashboard"]?>">Volver al panel</a></p>
-</body>
-</html>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

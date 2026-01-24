@@ -24,7 +24,6 @@ $backUrl = "tickets_globales.php";
 if ($return === "asignados") $backUrl = "tickets_asignados.php";
 if ($return === "mis")       $backUrl = "listar_tickets.php";
 
-
 $sql = "SELECT
           t.id_ticket, t.descripcion, t.prioridad,
           t.fecha_creacion, t.fecha_actualizacion,
@@ -53,13 +52,11 @@ if ($res->num_rows !== 1) {
 
 $ticket = $res->fetch_assoc();
 
-
 if ($idRol === 1 && (int)$ticket["id_usuario"] !== $idUser) {
   header("Location: {$backUrl}?error=No+tienes+permiso+para+ver+este+ticket");
   exit;
 }
 
-//ultma bitacora
 $bit = null;
 $sqlBit = "SELECT
              b.accion, b.detalle, b.fecha_evento,
@@ -77,61 +74,68 @@ if ($resB->num_rows === 1) $bit = $resB->fetch_assoc();
 
 $flash_ok = $_SESSION["flash_ok"] ?? "";
 unset($_SESSION["flash_ok"]);
+
+$page_title = "Ticket #" . (int)$ticket["id_ticket"];
+require_once __DIR__ . '/../includes/header.php';
 ?>
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Ticket #<?= (int)$ticket["id_ticket"] ?></title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
 
-<h1>Ticket #<?= (int)$ticket["id_ticket"] ?></h1>
+<div class="card">
+  <h1 class="title">Ticket #<?= (int)$ticket["id_ticket"] ?></h1>
+  <p class="subtitle">Detalle del ticket y última actualización</p>
 
-<?php if ($flash_ok): ?>
-  <p style="color:green;"><?= htmlspecialchars($flash_ok) ?></p>
-<?php endif; ?>
-
-<p><b>Creador:</b> <?= htmlspecialchars($ticket["creador"]) ?></p>
-<p><b>Categoria:</b> <?= htmlspecialchars($ticket["nombre_categoria"]) ?></p>
-<p><b>Prioridad:</b> <?= htmlspecialchars($ticket["prioridad"]) ?></p>
-<p><b>Estado:</b> <?= htmlspecialchars($ticket["nombre_estado"]) ?></p>
-<p><b>Tecnico asignado:</b> <?= htmlspecialchars($ticket["tecnico_asignado"] ?? "Sin asignar") ?></p>
-<p><b>Fecha creacion:</b> <?= htmlspecialchars($ticket["fecha_creacion"]) ?></p>
-<p><b>Ultima actualizacion (ticket):</b> <?= htmlspecialchars($ticket["fecha_actualizacion"]) ?></p>
-
-<hr>
-
-<p><b>Descripcion:</b></p>
-<textarea rows="6" cols="90" readonly><?= htmlspecialchars($ticket["descripcion"]) ?></textarea>
-
-<hr>
-
-
-<h2>Ultima actualizacion (bitacora)</h2>
-
-<?php if ($bit): ?>
-  <p><b>Accion:</b> <?= htmlspecialchars($bit["accion"]) ?></p>
-  <p><b>Por:</b> <?= htmlspecialchars($bit["usuario_bitacora"]) ?></p>
-  <p><b>Fecha:</b> <?= htmlspecialchars($bit["fecha_evento"]) ?></p>
-  <p><b>Detalle:</b></p>
-  <textarea rows="4" cols="90" readonly><?= htmlspecialchars($bit["detalle"]) ?></textarea>
-<?php else: ?>
-  <p>No hay registros de bitacora para este ticket.</p>
-<?php endif; ?>
-
-<hr>
-
-<p>
-  <?php if ($idRol === 3): ?>
-    <a href="editar_ticket.php?id_ticket=<?= (int)$ticket["id_ticket"] ?>&return=<?= urlencode($return) ?>">Editar</a>
-  <?php elseif ($idRol === 2 && (int)($ticket["id_usuario2"] ?? 0) === $idUser): ?>
-    <a href="editar_ticket.php?id_ticket=<?= (int)$ticket["id_ticket"] ?>&return=<?= urlencode($return) ?>">Editar</a>
+  <?php if ($flash_ok): ?>
+    <div class="alert" style="border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12);">
+      <?= htmlspecialchars($flash_ok) ?>
+    </div>
   <?php endif; ?>
 
-  <a href="<?= htmlspecialchars($backUrl) ?>">Volver</a>
-</p>
 
-</body>
-</html>
+  <div class="card" style="padding:14px; background: rgba(255,255,255,0.04); border-radius: 14px; border: 1px solid rgba(255,255,255,0.10); box-shadow:none;">
+    <p><b>Creador:</b> <?= htmlspecialchars($ticket["creador"]) ?></p>
+    <p><b>Categoría:</b> <?= htmlspecialchars($ticket["nombre_categoria"]) ?></p>
+    <p><b>Prioridad:</b> <?= htmlspecialchars($ticket["prioridad"]) ?></p>
+    <p><b>Estado:</b> <?= htmlspecialchars($ticket["nombre_estado"]) ?></p>
+    <p><b>Técnico asignado:</b> <?= htmlspecialchars($ticket["tecnico_asignado"] ?? "Sin asignar") ?></p>
+    <p><b>Fecha creación:</b> <?= htmlspecialchars($ticket["fecha_creacion"]) ?></p>
+    <p><b>Última actualización (ticket):</b> <?= htmlspecialchars($ticket["fecha_actualizacion"]) ?></p>
+  </div>
+
+  <div style="margin-top:14px;">
+    <h2 class="title" style="font-size:18px; margin-bottom:10px;">Descripción</h2>
+    <textarea readonly rows="6" style="width:100%;"><?= htmlspecialchars($ticket["descripcion"]) ?></textarea>
+  </div>
+
+  <div style="margin-top:14px;">
+    <h2 class="title" style="font-size:18px; margin-bottom:10px;">Última actualización (bitácora)</h2>
+
+    <?php if ($bit): ?>
+      <div class="card" style="padding:14px; background: rgba(255,255,255,0.04); border-radius: 14px; border: 1px solid rgba(255,255,255,0.10); box-shadow:none;">
+        <p><b>Acción:</b> <?= htmlspecialchars($bit["accion"]) ?></p>
+        <p><b>Por:</b> <?= htmlspecialchars($bit["usuario_bitacora"]) ?></p>
+        <p><b>Fecha:</b> <?= htmlspecialchars($bit["fecha_evento"]) ?></p>
+        <p class="muted" style="margin-top:10px;"><b>Detalle:</b></p>
+        <textarea readonly rows="4" style="width:100%;"><?= htmlspecialchars($bit["detalle"]) ?></textarea>
+      </div>
+    <?php else: ?>
+      <p class="muted">No hay registros de bitácora para este ticket.</p>
+    <?php endif; ?>
+  </div>
+
+  <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+    <?php if ($idRol === 3): ?>
+      <a class="btn btn-primary"
+         href="editar_ticket.php?id_ticket=<?= (int)$ticket["id_ticket"] ?>&return=<?= urlencode($return) ?>">
+        Editar
+      </a>
+    <?php elseif ($idRol === 2 && (int)($ticket["id_usuario2"] ?? 0) === $idUser): ?>
+      <a class="btn btn-primary"
+         href="editar_ticket.php?id_ticket=<?= (int)$ticket["id_ticket"] ?>&return=<?= urlencode($return) ?>">
+        Editar
+      </a>
+    <?php endif; ?>
+
+    <a class="btn" href="<?= htmlspecialchars($backUrl) ?>">Volver</a>
+  </div>
+</div>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

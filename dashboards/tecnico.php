@@ -1,47 +1,34 @@
 <?php
 require_once("../includes/auth.php");
-
 require_role("Tecnico");
+
+$page_title = "Panel Técnico";
+require_once __DIR__ . '/../includes/header.php';
 
 $flash_ok = $_SESSION["flash_ok"] ?? "";
 unset($_SESSION["flash_ok"]);
 ?>
 
-<?php if ($flash_ok): ?>
-  <p style="color:green;"><?= htmlspecialchars($flash_ok) ?></p>
-<?php endif; ?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel Tecnico</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
-
-<h1>Panel de Perfil Tecnico</h1>
-
-<p>
+<div class="card">
+  <p class="subtitle">
     Bienvenido,
     <strong><?= htmlspecialchars($_SESSION["nombre"]) ?></strong>
-</p>
+  </p>
 
-<p>
-    Rol detectado por el sistema:
-    <strong><?= htmlspecialchars($_SESSION["nombre_rol"]) ?></strong>
-</p>
 
-<p>
+  <?php if ($flash_ok): ?>
+    <div class="alert" style="border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12);">
+      <?= htmlspecialchars($flash_ok) ?>
+    </div>
+  <?php endif; ?>
+
+  <div class="navlinks">
     <a href="../usuarios/crear_usuario.php">Crear Usuario</a>
     <a href="../tickets/crear_ticket.php">Crear Ticket</a>
-    <a href="../tickets/listar_tickets.php">Tickets Creados</a>
+    <a href="../tickets/listar_tickets.php">Mis Tickets</a>
     <a href="../tickets/tickets_globales.php">Tickets Globales</a>
     <a href="../tickets/tickets_asignados.php">Tickets Asignados</a>
+  </div>
+</div>
 
-</p>
-
-<a href="../auth/logout.php">Cerrar sesion</a>
-
-</body>
-</html>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

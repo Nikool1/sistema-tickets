@@ -9,7 +9,7 @@ if (!isset($_SESSION["id_usuario"])) {
 $idRol  = (int)($_SESSION["id_rol"] ?? 0);
 $idUser = (int)$_SESSION["id_usuario"];
 
-//solo admin(3) y tecnico(2)
+// solo admin(3) y tecnico(2)
 if ($idRol !== 2 && $idRol !== 3) {
   header("Location: ../auth/login.php");
   exit;
@@ -24,18 +24,17 @@ if ($idTicket <= 0) {
 }
 
 $return = $_GET["return"] ?? "globales";
-
 $backUrl = ($return === "asignados")
   ? "tickets_asignados.php"
   : "tickets_globales.php";
 
-
-$sql = "SELECT t.id_ticket, t.descripcion, t.prioridad, t.fecha_creacion, t.fecha_actualizacion,
-               t.id_usuario, t.id_usuario2, t.id_categoria, t.id_estado,
-               c.nombre_categoria,
-               e.nombre_estado,
-               u.nombre_usuario AS creador,
-               ut.nombre_usuario AS tecnico_asignado
+$sql = "SELECT
+          t.id_ticket, t.descripcion, t.prioridad, t.fecha_creacion, t.fecha_actualizacion,
+          t.id_usuario, t.id_usuario2, t.id_categoria, t.id_estado,
+          c.nombre_categoria,
+          e.nombre_estado,
+          u.nombre_usuario AS creador,
+          ut.nombre_usuario AS tecnico_asignado
         FROM tickets t
         JOIN categorias c ON c.id_categoria = t.id_categoria
         JOIN estados e ON e.id_estado = t.id_estado
@@ -56,7 +55,7 @@ if ($res->num_rows !== 1) {
 
 $ticket = $res->fetch_assoc();
 
-//solo si es tecnico
+// solo si es tecnico
 if ($idRol === 2) {
   $asignado = $ticket["id_usuario2"];
   if ($asignado === null || (int)$asignado !== $idUser) {
@@ -71,7 +70,7 @@ while ($row = $rEstados->fetch_assoc()) $estados[] = $row;
 
 $prioridades = ["En Proceso", "Baja", "Media", "Alta"];
 
-//solo para admin, asign tecnico
+// solo admin asigna tecnico
 $tecnicos = [];
 if ($idRol === 3) {
   $sqlTec = "SELECT id_usuario, nombre_usuario
@@ -84,87 +83,92 @@ if ($idRol === 3) {
 
 $error = $_GET["error"] ?? "";
 $ok    = $_GET["ok"] ?? "";
+
+$page_title = "Editar Ticket #" . (int)$ticket["id_ticket"];
+require_once __DIR__ . '/../includes/header.php';
 ?>
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Editar Ticket #<?= (int)$ticket["id_ticket"] ?></title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
 
-<h1>Editar Ticket #<?= (int)$ticket["id_ticket"] ?></h1>
+<div class="card">
+  <h1 class="title">Editar Ticket #<?= (int)$ticket["id_ticket"] ?></h1>
+  <p class="subtitle">Actualizar estado, prioridad y bitácora</p>
 
-<?php if ($error): ?>
-  <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-<?php endif; ?>
-
-<?php if ($ok): ?>
-  <p style="color:green;"><?= htmlspecialchars($ok) ?></p>
-<?php endif; ?>
-
-<!-- aatos del ticket-->
-<p><b>Creador:</b> <?= htmlspecialchars($ticket["creador"]) ?></p>
-<p><b>Categoria:</b> <?= htmlspecialchars($ticket["nombre_categoria"]) ?></p>
-<p><b>Estado actual:</b> <?= htmlspecialchars($ticket["nombre_estado"]) ?></p>
-<p><b>Tecnico asignado:</b> <?= htmlspecialchars($ticket["tecnico_asignado"] ?? "Sin asignar") ?></p>
-
-<p><b>Descripcion:</b><br>
-<textarea rows="6" cols="80" readonly><?= htmlspecialchars($ticket["descripcion"]) ?></textarea></p>
-
-<hr>
-
-<form method="post" action="actualizar_ticket.php">
-  <input type="hidden" name="id_ticket" value="<?= (int)$ticket["id_ticket"] ?>">
-  <input type="hidden" name="return" value="<?= htmlspecialchars($return) ?>">
-
-  <label>Prioridad</label><br>
-  <select name="prioridad" required>
-    <?php foreach ($prioridades as $p): ?>
-      <option value="<?= htmlspecialchars($p) ?>" <?= ($ticket["prioridad"] === $p ? "selected" : "") ?>>
-        <?= htmlspecialchars($p) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-  <br><br>
-
-  <label>Estado</label><br>
-  <select name="id_estado" required>
-    <?php foreach ($estados as $e): ?>
-      <option value="<?= (int)$e["id_estado"] ?>" <?= ((int)$ticket["id_estado"] === (int)$e["id_estado"] ? "selected" : "") ?>>
-        <?= htmlspecialchars($e["nombre_estado"]) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-  <br><br>
-
-  <!--solo admin ve esto-->
-  <?php if ($idRol === 3): ?>
-    <label>Asignar tecnico</label><br>
-    <select name="id_usuario2">
-      <option value="">-- Sin asignar --</option>
-      <?php foreach ($tecnicos as $t): ?>
-        <option value="<?= (int)$t["id_usuario"] ?>" <?= ((int)($ticket["id_usuario2"] ?? 0) === (int)$t["id_usuario"] ? "selected" : "") ?>>
-          <?= htmlspecialchars($t["nombre_usuario"]) ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
-    <br><br>
+  <?php if ($error): ?>
+    <div class="alert"><?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
 
-  <label>Detalle / comentario (bitacora)</label><br>
-  <textarea name="detalle" rows="4" cols="80" required></textarea>
-  <br><br>
+  <?php if ($ok): ?>
+    <div class="alert" style="border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12);">
+      <?= htmlspecialchars($ok) ?>
+    </div>
+  <?php endif; ?>
 
-  <button type="submit">Guardar cambios</button>
-</form>
+  <!-- Datos actuales -->
+  <div class="card" style="padding:14px; background: rgba(255,255,255,0.04); border-radius:14px; border:1px solid rgba(255,255,255,0.10); box-shadow:none;">
+    <p><b>Creador:</b> <?= htmlspecialchars($ticket["creador"]) ?></p>
+    <p><b>Categoría:</b> <?= htmlspecialchars($ticket["nombre_categoria"]) ?></p>
+    <p><b>Estado actual:</b> <?= htmlspecialchars($ticket["nombre_estado"]) ?></p>
+    <p><b>Técnico asignado:</b> <?= htmlspecialchars($ticket["tecnico_asignado"] ?? "Sin asignar") ?></p>
 
-<p>
-  <a href="ver_ticket.php?id_ticket=<?= $idTicket ?>&return=<?= urlencode($return) ?>">Ver ticket</a>
-  <a href="<?= $backUrl ?>">Volver</a>
+    <p class="muted" style="margin-top:10px;"><b>Descripción:</b></p>
+    <textarea readonly rows="5" style="width:100%;"><?= htmlspecialchars($ticket["descripcion"]) ?></textarea>
+  </div>
 
-</p>
+  <!-- Formulario -->
+  <form class="form" method="post" action="actualizar_ticket.php" style="margin-top:14px;">
+    <input type="hidden" name="id_ticket" value="<?= (int)$ticket["id_ticket"] ?>">
+    <input type="hidden" name="return" value="<?= htmlspecialchars($return) ?>">
 
-</body>
-</html>
+    <div class="field">
+      <label>Prioridad</label>
+      <select name="prioridad" required>
+        <?php foreach ($prioridades as $p): ?>
+          <option value="<?= htmlspecialchars($p) ?>" <?= ($ticket["prioridad"] === $p ? "selected" : "") ?>>
+            <?= htmlspecialchars($p) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Estado</label>
+      <select name="id_estado" required>
+        <?php foreach ($estados as $e): ?>
+          <option value="<?= (int)$e["id_estado"] ?>" <?= ((int)$ticket["id_estado"] === (int)$e["id_estado"] ? "selected" : "") ?>>
+            <?= htmlspecialchars($e["nombre_estado"]) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <?php if ($idRol === 3): ?>
+      <div class="field">
+        <label>Asignar técnico</label>
+        <select name="id_usuario2">
+          <option value="">-- Sin asignar --</option>
+          <?php foreach ($tecnicos as $t): ?>
+            <option value="<?= (int)$t["id_usuario"] ?>"
+              <?= ((int)($ticket["id_usuario2"] ?? 0) === (int)$t["id_usuario"] ? "selected" : "") ?>>
+              <?= htmlspecialchars($t["nombre_usuario"]) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    <?php endif; ?>
+
+    <div class="field">
+      <label>Detalle / comentario (bitácora)</label>
+      <textarea name="detalle" rows="4" required></textarea>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-primary" type="submit">Guardar cambios</button>
+      <a class="btn"
+         href="ver_ticket.php?id_ticket=<?= $idTicket ?>&return=<?= urlencode($return) ?>">
+        Ver ticket
+      </a>
+      <a class="btn" href="<?= $backUrl ?>">Volver</a>
+    </div>
+  </form>
+</div>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

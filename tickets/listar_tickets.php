@@ -8,6 +8,9 @@ if (!isset($_SESSION["id_usuario"])) {
 
 require_once("../config/db.php");
 
+$page_title = "Mis Tickets";
+require_once __DIR__ . '/../includes/header.php';
+
 $idUsuario = intval($_SESSION["id_usuario"]);
 
 $sql = "
@@ -38,57 +41,54 @@ if ($result) {
   }
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Mis Tickets</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
 
-<h1>Mis Tickets</h1>
+<div class="card">
+  <h1 class="title">Mis Tickets</h1>
+  <p class="subtitle">Listado de tus tickets creados</p>
 
-<?php if (count($tickets) === 0): ?>
-  <p>No tienes tickets registrados.</p>
-<?php else: ?>
-  <table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Categoria</th>
-        <th>Estado</th>
-        <th>Prioridad</th>
-        <th>Creación</th>
-        <th>Actualización</th>
-        <th>Descripción</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
+  <?php if (count($tickets) === 0): ?>
+    <p class="muted">No tienes tickets registrados.</p>
+  <?php else: ?>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Creación</th>
+            <th>Actualización</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-    <tbody>
-      <?php foreach ($tickets as $t): ?>
-        <tr>
-          <td><?= (int)$t["id_ticket"] ?></td>
-          <td><?= htmlspecialchars($t["nombre_categoria"]) ?></td>
-          <td><?= htmlspecialchars($t["nombre_estado"]) ?></td>
-          <td><?= htmlspecialchars($t["prioridad"]) ?></td>
-          <td><?= htmlspecialchars($t["fecha_creacion"]) ?></td>
-          <td><?= htmlspecialchars($t["fecha_actualizacion"]) ?></td>
-          <td><?= htmlspecialchars($t["descripcion"]) ?></td>
-          <td>
-            <a href="ver_ticket.php?id_ticket=<?= (int)$t["id_ticket"] ?>&return=mis">
-              Ver
-            </a>
-          </td>
-        </tr>
+        <tbody>
+          <?php foreach ($tickets as $t): ?>
+            <tr>
+              <td><?= (int)$t["id_ticket"] ?></td>
+              <td><?= htmlspecialchars($t["nombre_categoria"]) ?></td>
+              <td><?= htmlspecialchars($t["nombre_estado"]) ?></td>
+              <td><?= htmlspecialchars($t["prioridad"]) ?></td>
+              <td><?= htmlspecialchars($t["fecha_creacion"]) ?></td>
+              <td><?= htmlspecialchars($t["fecha_actualizacion"]) ?></td>
+              <td><?= htmlspecialchars($t["descripcion"]) ?></td>
+              <td>
+                <a class="btn btn-primary" href="ver_ticket.php?id_ticket=<?= (int)$t["id_ticket"] ?>&return=mis">
+                  Ver
+                </a>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  <?php endif; ?>
 
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-<?php endif; ?>
+  <div style="margin-top:14px;">
+    <a class="btn" href="../dashboards/<?= htmlspecialchars($_SESSION["dashboard"]) ?>">Volver al panel</a>
+  </div>
+</div>
 
-<p><a href="../dashboards/<?= htmlspecialchars($_SESSION["dashboard"]) ?>">Volver al panel</a></p>
-
-</body>
-</html>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

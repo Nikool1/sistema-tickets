@@ -6,47 +6,51 @@ if (!isset($_SESSION["id_usuario"])) {
 }
 require_once("../config/db.php");
 
+$page_title = "Crear Ticket";
+require_once __DIR__ . '/../includes/header.php';
+
 $cats = $conn->query("SELECT id_categoria, nombre_categoria FROM categorias ORDER BY nombre_categoria");
 $error = $_GET["error"] ?? "";
 $ok = $_GET["ok"] ?? "";
-
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Crear Ticket</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
-  <h1>Crear Ticket</h1>
+
+<div class="card">
+  <h1 class="title">Crear Ticket</h1>
+  <p class="subtitle">Registra una solicitud a Informática</p>
 
   <?php if ($error): ?>
-    <p style="color:red;"><?= htmlspecialchars($error) ?></p>
+    <div class="alert"><?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
 
   <?php if ($ok): ?>
-    <p style="color:green;"><?= htmlspecialchars($ok) ?></p>
+    <div class="alert" style="border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12);">
+      <?= htmlspecialchars($ok) ?>
+    </div>
   <?php endif; ?>
 
-  <form method="post" action="guardar_ticket.php">
+  <form class="form" method="post" action="guardar_ticket.php">
+    <div class="field">
+      <label>Categoría</label>
+      <select name="id_categoria" required>
+        <option value="">-- Seleccione --</option>
+        <?php while($c = $cats->fetch_assoc()): ?>
+          <option value="<?= (int)$c["id_categoria"] ?>">
+            <?= htmlspecialchars($c["nombre_categoria"]) ?>
+          </option>
+        <?php endwhile; ?>
+      </select>
+    </div>
 
-    <label>Categoría</label><br>
-    <select name="id_categoria" required>
-      <option value="">-- Seleccione --</option>
-      <?php while($c = $cats->fetch_assoc()): ?>
-        <option value="<?= (int)$c["id_categoria"] ?>">
-          <?= htmlspecialchars($c["nombre_categoria"]) ?>
-        </option>
-      <?php endwhile; ?>
-    </select><br><br>
+    <div class="field">
+      <label>Descripción</label>
+      <textarea name="descripcion" rows="6" required></textarea>
+    </div>
 
-    <label>Descripción</label><br>
-    <textarea name="descripcion" rows="6" cols="80" required></textarea><br><br>
-
-    <button type="submit">Crear</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-primary" type="submit">Crear</button>
+      <a class="btn" href="../dashboards/<?= htmlspecialchars($_SESSION["dashboard"]) ?>">Volver al panel</a>
+    </div>
   </form>
+</div>
 
-  <p><a href="../dashboards/<?=$_SESSION["dashboard"]?>">Volver al panel</a></p>
-</body>
-</html>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

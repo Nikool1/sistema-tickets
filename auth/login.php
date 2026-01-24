@@ -23,15 +23,20 @@ $error = $_GET["error"] ?? "";
       <div class="alert"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="post" action="validar_login.php">
-      <label>Correo institucional</label>
-      <input type="email" name="correo" required>
+    <form method="post" action="validar_login.php" class="form">
+      <div class="field">
+        <label>Correo institucional</label>
+        <input class="input" type="email" name="correo" required>
+      </div>
 
-      <label>Contraseña</label>
-      <input type="password" name="password" required>
+      <div class="field">
+        <label>Contraseña</label>
+        <input class="input" type="password" name="password" required>
+      </div>
 
-      <button type="submit">Ingresar</button>
+       <button class="btn btn-primary" type="submit">Ingresar</button>
     </form>
+
   </div>
 </body>
 </html>
